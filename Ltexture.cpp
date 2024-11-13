@@ -69,20 +69,16 @@ void Ltexture::free()
     }
 }
 
-void Ltexture::render( int x, int y , SDL_Rect* clip, SDL_Renderer* gRenderer)
+void Ltexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
 {
-    //Set rendering space and render to screen
-    SDL_Rect renderQuad = { x, y, mWidth, mHeight };
+    //Modulate texture
+    SDL_SetTextureColorMod( mTexture, red, green, blue );
+}
 
-    //Set clip rendering dimensions
-    if ( clip != NULL )
-    {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
-    }
-
+void Ltexture::render( int x, int y , SDL_Renderer* gRenderer)
+{
     //Render to screen
-    SDL_RenderCopy( gRenderer, mTexture, clip, &renderQuad );
+    SDL_RenderCopy( gRenderer, mTexture, NULL, NULL );
 }
 
 int Ltexture::getWidth()
