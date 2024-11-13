@@ -1,0 +1,5 @@
+/home/sidoku/SDL2_projects/build/CMakeFiles/SDL2_Tutorial.dir
+/home/sidoku/SDL2_projects/build/CMakeFiles/package.dir
+/home/sidoku/SDL2_projects/build/CMakeFiles/package_source.dir
+/home/sidoku/SDL2_projects/build/CMakeFiles/edit_cache.dir
+/home/sidoku/SDL2_projects/build/CMakeFiles/rebuild_cache.dir

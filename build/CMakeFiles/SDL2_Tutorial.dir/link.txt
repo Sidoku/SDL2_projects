@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/SDL2_Tutorial.dir/SDL2_tutorial.cpp.o -o SDL2_Tutorial  -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer 

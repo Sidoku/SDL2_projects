@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/sidoku/01_hello_SDL",
+            "binaryPath": "/home/sidoku/01_hello_SDL/01_hello_SDL",
+            "binaryArgs": []
+        }
+    ]
+}
