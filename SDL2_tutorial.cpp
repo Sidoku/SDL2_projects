@@ -16,6 +16,9 @@ and may not be redistributed without written permission.*/
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 426;
 
+//Walking animation constant
+const int WALKING_ANIMATION_FRAMES = 4;
+
 //Key press surfaces constants
 enum KeyPressSurfaces
 {
@@ -46,7 +49,7 @@ SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 
 //Scene textures
-Ltexture gFooTexture;
+Ltexture gSpriteSheetTexture;
 Ltexture gBackgroundTexture;
 Ltexture gModulatedTexture;
 
@@ -63,8 +66,7 @@ SDL_Surface* loadSurface( std::string path );
 SDL_Surface* gKeyPressSurfaces[ KEY_PRESS_SURFACE_TOTAL ];
 
 //Scene sprites
-SDL_Rect gSpriteClips[ 4 ];
-Ltexture gSpriteSheetTexture;
+SDL_Rect gSpriteClips[ WALKING_ANIMATION_FRAMES ];
 
 //Current displayed image
 SDL_Surface* gCurrentSurface = NULL;
@@ -91,8 +93,8 @@ bool init()
 		}
 		else
 		{
-			//Create renderer for window
-			gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED );
+			//Create vsynced renderer for window
+			gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 			if( gRenderer == NULL)
 			{
 				printf( "Renderer could not be created, SDL_Error: %s\n", SDL_GetError() );
@@ -154,6 +156,36 @@ bool loadMedia()
 		printf( "Failed to load background texture!\n" );
 		success = false;
 	}
+
+	if ( !gSpriteSheetTexture.loadFromFile( "Images/foo.png", gRenderer ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		//Set sprite clips
+		gSpriteClips[ 0 ].x = 0;
+		gSpriteClips[ 0 ].y = 0;
+        gSpriteClips[ 0 ].w = 64;
+        gSpriteClips[ 0 ].h = 205;
+
+        gSpriteClips[ 1 ].x = 64;
+        gSpriteClips[ 1 ].y = 0;
+        gSpriteClips[ 1 ].w = 64;
+        gSpriteClips[ 1 ].h = 205;
+        
+        gSpriteClips[ 2 ].x = 128;
+        gSpriteClips[ 2 ].y = 0;
+        gSpriteClips[ 2 ].w = 64;
+        gSpriteClips[ 2 ].h = 205;
+
+        gSpriteClips[ 3 ].x = 192;
+        gSpriteClips[ 3 ].y = 0;
+        gSpriteClips[ 3 ].w = 64;
+        gSpriteClips[ 3 ].h = 205;
+	}
+	
 	
 	return success;
 }
@@ -188,7 +220,7 @@ SDL_Surface* loadSurface( std::string path)
 void close()
 {
 	//Free loaded image
-	gFooTexture.free();
+	gSpriteSheetTexture.free();
 	gBackgroundTexture.free();
 	gModulatedTexture.free();
 
@@ -227,6 +259,9 @@ int main( int argc, char* args[] )
 			Uint8 g = 255;
 			Uint8 b = 255;
 			Uint8 a = 255;
+
+			//Current animation frame
+			int frame = 0;
 
 			//Main loop flag
 			bool quit = false;
@@ -314,16 +349,29 @@ int main( int argc, char* args[] )
                 SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
                 SDL_RenderClear( gRenderer );
 
-				//Render background
-				gBackgroundTexture.render( 0, 0 , NULL , gRenderer);
+				//Render current frame
+				SDL_Rect* currentClip = &gSpriteClips[ frame / 4 ]; //frame updates only every 4 frames
+				gSpriteSheetTexture.render( ( SCREEN_WIDTH - currentClip->w ) / 2, ( SCREEN_HEIGHT - currentClip->h ) / 2, currentClip, gRenderer );
 
-				//Render front blended
-				gModulatedTexture.setColor( r, g, b );
-				gModulatedTexture.setAlpha( a );
-				gModulatedTexture.render( 0, 0, NULL, gRenderer );
+				// //Render background
+				// gBackgroundTexture.render( 0, 0 , NULL , gRenderer);
+
+				// //Render front blended
+				// gModulatedTexture.setColor( r, g, b );
+				// gModulatedTexture.setAlpha( a );
+				// gModulatedTexture.render( 0, 0, NULL, gRenderer );
 
                 //Update screen
                 SDL_RenderPresent( gRenderer );
+
+				//Go to next frame
+				++frame;
+
+				//Cycle animation
+				if ( frame / 4 >= WALKING_ANIMATION_FRAMES )
+				{
+					frame = 0;
+				}	
 			}
 		}
 	}
