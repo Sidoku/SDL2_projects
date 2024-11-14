@@ -113,6 +113,7 @@ bool init()
 			}
 		}
 	}
+
 	return success;
 }
 
@@ -121,32 +122,11 @@ SDL_Texture* loadTexture( std::string path )
 	//The final texture
 	SDL_Texture* newTexture = NULL;
 
-	// //Load image at specified path
-	// SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	// if ( loadedSurface == NULL )
-	// {
-	// 	printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	// }
-	// else
-	// {
-	// 	newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-	// 	if ( newTexture == NULL)
-	// 	{
-	// 		printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-	// 	}
-	
-	// 	//Free old loaded surface
-	// 	SDL_FreeSurface( loadedSurface );
-	// }
-
 	newTexture = IMG_LoadTexture( gRenderer, path.c_str() );
 	if ( newTexture == NULL)
 		{
 			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
 		}
-	
-		//Free old loaded surface
-		//SDL_FreeSurface( loadedSurface );
 
 	return newTexture;
 }
@@ -156,10 +136,22 @@ bool loadMedia()
 	//Loading success flag
 	bool success = true;
 
-	//Load sprite sheet texture
+	//Load front alpha texture
 	if( !gModulatedTexture.loadFromFile( "Images/colors.png", gRenderer ) )
 	{
-		printf( "Failed to load sprite sheet texture!\n" );
+		printf( "Failed to load front texture!\n" );
+		success = false;
+	}
+	else
+	{
+		//Set standard alpha blending
+		gModulatedTexture.setBlendMode( SDL_BLENDMODE_BLEND );
+	}
+
+	//Load background texture
+	if( !gBackgroundTexture.loadFromFile( "Images/background.png", gRenderer ) )
+	{
+		printf( "Failed to load background texture!\n" );
 		success = false;
 	}
 	
@@ -234,6 +226,7 @@ int main( int argc, char* args[] )
 			Uint8 r = 255;
 			Uint8 g = 255;
 			Uint8 b = 255;
+			Uint8 a = 255;
 
 			//Main loop flag
 			bool quit = false;
@@ -282,7 +275,35 @@ int main( int argc, char* args[] )
                         case SDLK_d:
                             b -= 32;
                             break;
-						
+
+						//Increase alpha on 1
+						case SDLK_1:
+							//Cap if over 255
+							if ( a + 32 > 255 )
+							{
+								a = 255;
+							}
+							//Increment otherwise
+							else
+							{
+								a += 32;
+							}
+							break;
+
+						//Decrease alpha on 0
+						case SDLK_0:
+							//Cap if below 0
+							if ( a - 32 < 0)
+							{
+								a = 0;
+							}
+							//Decrement otherwise
+							else
+							{
+								a -= 32;
+							}
+							break;
+
 						default:
 							break;
 						}
@@ -293,9 +314,13 @@ int main( int argc, char* args[] )
                 SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
                 SDL_RenderClear( gRenderer );
 
-				//Modulate and render texture
+				//Render background
+				gBackgroundTexture.render( 0, 0 , NULL , gRenderer);
+
+				//Render front blended
 				gModulatedTexture.setColor( r, g, b );
-				gModulatedTexture.render( 0, 0, gRenderer );
+				gModulatedTexture.setAlpha( a );
+				gModulatedTexture.render( 0, 0, NULL, gRenderer );
 
                 //Update screen
                 SDL_RenderPresent( gRenderer );

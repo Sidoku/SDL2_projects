@@ -75,10 +75,22 @@ void Ltexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
     SDL_SetTextureColorMod( mTexture, red, green, blue );
 }
 
-void Ltexture::render( int x, int y , SDL_Renderer* gRenderer)
+void Ltexture::setBlendMode( SDL_BlendMode blending )
+{
+    //Set blending mode
+    SDL_SetTextureBlendMode( mTexture, blending );
+}
+
+void Ltexture::setAlpha( Uint8 alpha )
+{
+    //Modulate texture alpha
+    SDL_SetTextureAlphaMod( mTexture, alpha );
+}
+
+void Ltexture::render( int x, int y , SDL_Rect* clip, SDL_Renderer* gRenderer)
 {
     //Render to screen
-    SDL_RenderCopy( gRenderer, mTexture, NULL, NULL );
+    SDL_RenderCopy( gRenderer, mTexture, clip, NULL );
 }
 
 int Ltexture::getWidth()
